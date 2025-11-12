@@ -1,1 +1,25 @@
 commands.txt
+# ---------------------------
+# Terraform
+# ---------------------------
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+crash.log
+
+# ---------------------------
+# Python / Flask
+# ---------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+*.venv
+venv/
+env/
+*.egg-info/
+pip-wheel-metadata/
+
+# -----------------------
