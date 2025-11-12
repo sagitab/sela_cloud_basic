@@ -18,8 +18,8 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
           aws-region: us-east-1  # replace with your region
 
       # 3. Login to ECR
@@ -38,12 +38,5 @@ jobs:
       - name: Push Docker image to ECR
         run: |
           docker push $IMAGE_URI
+          echo "image pushed to docker"
 
-      # 6. Deploy to ECS Fargate
-      - name: Deploy to ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
-        with:
-          task-definition: ecs-task-def.json
-          service: flask-web-app-service
-          cluster: flask-web-app-cluster
-          wait-for-service-stability: true
