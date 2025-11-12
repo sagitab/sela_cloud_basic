@@ -39,4 +39,12 @@ jobs:
         run: |
           docker push $IMAGE_URI
           echo "image pushed to docker!"
+      #deploy to ecs fargate
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: flask-web-app-task-def.json
+          service: flask-web-app-task-service-sicr1drl
+          cluster: sagi-flask-web-app-cluster
+          wait-for-service-stability: true
 
