@@ -38,5 +38,5 @@ jobs:
       - name: Push Docker image to ECR
         run: |
           docker push $IMAGE_URI
-          echo "image pushed to docker"
+          echo "image pushed to docker!"
 
