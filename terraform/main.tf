@@ -154,8 +154,8 @@ resource "aws_security_group" "rds_sg" {
 
   # Allow access from ECS Fargate security group (replace with your SG)
   ingress {
-    from_port   = 3306
-    to_port     = 3306
+    from_port   = 3307
+    to_port     = 3307
     protocol    = "tcp"
     security_groups = [aws_security_group.flask_sg.id]
   }
