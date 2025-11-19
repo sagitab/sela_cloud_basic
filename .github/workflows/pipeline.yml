@@ -42,7 +42,7 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.10.4  # Specify your desired Terraform version
+          terraform_version: 1.10.4  # Specify your desired Terraform version!
 
       - name: Cache Terraform providers
         uses: actions/cache@v3
