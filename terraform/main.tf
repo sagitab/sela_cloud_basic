@@ -216,21 +216,21 @@ output "db_endpoint" {
 output "db_port" {
   value = aws_db_instance.flask_db.port
 }
-
-resource "null_resource" "create_table" {
-  depends_on = [aws_db_instance.flask_db]
-
-  provisioner "local-exec" {
-    command = <<EOT
-      mysql -h ${aws_db_instance.flask_db.endpoint} \
-            -P ${aws_db_instance.flask_db.port} \
-            -u ${var.rds_user} \
-            -p${var.rds_pass} \
-            -e "CREATE TABLE IF NOT EXISTS users (
-                  id INT AUTO_INCREMENT PRIMARY KEY,
-                  name VARCHAR(50)
-                );"
-    EOT
-  }
+provider "mysql" {
+  endpoint = "${aws_db_instance.mydb.address}:3306"
+  username = var.rds_user
+  password = var.rds_pass
+  
 }
+resource "mysql_query" "create_table" {
+  query = <<EOF
+CREATE TABLE IF NOT EXISTS users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE
+);
+EOF
+}
+
+
 
