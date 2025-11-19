@@ -43,8 +43,8 @@ jobs:
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: flask-web-app-task-def.json
-          service: flask-web-app-task-service-sicr1drl
+          task-definition: flask-web-app-task
+          service: flask-web-app-task-service
           cluster: sagi-flask-web-app-cluster
           wait-for-service-stability: true
 
