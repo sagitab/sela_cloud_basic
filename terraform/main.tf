@@ -9,6 +9,17 @@ terraform {
     encrypt        = true
   }
 }
+variable "rds_user" {
+  description = "Database username"
+  type        = string
+  sensitive   = true
+}
+
+variable "rds_pass" {
+  description = "Database password"
+  type        = string
+  sensitive   = true
+}
 
 
 # -------------------
@@ -126,4 +137,69 @@ resource "aws_security_group" "flask_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+# RDS
+
+variable "db_name" {
+  default = "flaskdb"
+}
+
+# --- Security group for DB ---
+resource "aws_security_group" "rds_sg" {
+  name        = "rds-sg"
+  description = "Allow access from ECS"
+  vpc_id      = aws_vpc.main.id
+
+  # Allow access from ECS Fargate security group (replace with your SG)
+  ingress {
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    security_groups = [aws_security_group.flask_sg.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# --- RDS Subnet group ---
+resource "aws_db_subnet_group" "flask_db_subnets" {
+  name       = "flask-db-subnet-group"
+  subnet_ids = [aws_subnet.private.id]
+  description = "Private subnets for Flask RDS"
+}
+
+# --- RDS instance ---
+resource "aws_db_instance" "flask_db" {
+  allocated_storage    = 20
+  storage_type         = "gp2"
+  engine               = "mysql"
+  engine_version       = "8.0"
+  instance_class       = "db.t3.micro"
+  db_name              = var.db_name
+  username             = var.rds_user
+  password             = var.rds_pass
+  publicly_accessible  = false
+  skip_final_snapshot  = true
+
+  vpc_security_group_ids = [aws_security_group.rds_sg.id]
+  db_subnet_group_name   = aws_db_subnet_group.flask_db_subnets.name
+
+  tags = {
+    Name = "FlaskApp-DB"
+  }
+}
+
+# --- Output ---
+output "db_endpoint" {
+  value = aws_db_instance.flask_db.endpoint
+}
+
+output "db_port" {
+  value = aws_db_instance.flask_db.port
 }

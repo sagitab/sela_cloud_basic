@@ -57,6 +57,10 @@ jobs:
           terraform init
           terraform plan
           terraform apply -auto-approve
+        env:
+          TF_VAR_rds_user: ${{ secrets.RDS_USER }}
+          TF_VAR_rds_pass: ${{ secrets.RDS_PASS }}
+        
       #deploy to ecs fargate
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
