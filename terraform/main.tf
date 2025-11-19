@@ -171,13 +171,20 @@ resource "aws_subnet" "private_b" {
   availability_zone = "us-east-1b"
   tags = { Name = "private-subnet-b" }
 }
+resource "aws_subnet" "public_b" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.4.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = "us-east-1b"
+  tags = { Name = "public-subnet-b" }
+}
 # subnet group
 resource "aws_db_subnet_group" "flask_db_subnets" {
   name        = "flask-db-subnet-group"
   description = "Private subnets for Flask RDS"
   subnet_ids  = [
-    aws_subnet.private.id,
-    aws_subnet.private_b.id
+    aws_subnet.public.id,
+    aws_subnet.public_b.id
   ]
 }
 # --- RDS instance ---
@@ -190,7 +197,7 @@ resource "aws_db_instance" "flask_db" {
   db_name              = var.db_name
   username             = var.rds_user
   password             = var.rds_pass
-  publicly_accessible  = false
+  publicly_accessible  = true
   skip_final_snapshot  = true
 
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
