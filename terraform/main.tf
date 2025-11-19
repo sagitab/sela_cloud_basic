@@ -144,7 +144,6 @@ resource "aws_security_group" "flask_sg" {
 variable "db_name" {
   default = "flaskdb"
 }
-
 # --- Security group for DB ---
 resource "aws_security_group" "rds_sg" {
   name        = "rds-sg"
@@ -166,14 +165,21 @@ resource "aws_security_group" "rds_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
-# --- RDS Subnet group ---
-resource "aws_db_subnet_group" "flask_db_subnets" {
-  name       = "flask-db-subnet-group"
-  subnet_ids = [aws_subnet.private.id]
-  description = "Private subnets for Flask RDS"
+resource "aws_subnet" "private_b" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.3.0/24"
+  availability_zone = "us-east-1b"
+  tags = { Name = "private-subnet-b" }
 }
-
+# subnet group
+resource "aws_db_subnet_group" "flask_db_subnets" {
+  name        = "flask-db-subnet-group"
+  description = "Private subnets for Flask RDS"
+  subnet_ids  = [
+    aws_subnet.private.id,
+    aws_subnet.private_b.id
+  ]
+}
 # --- RDS instance ---
 resource "aws_db_instance" "flask_db" {
   allocated_storage    = 20
