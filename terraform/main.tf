@@ -8,12 +8,6 @@ terraform {
     region         = "us-east-1"
     encrypt        = true
   }
-  required_providers {
-    mysql = {
-      source  = "terraform-providers/mysql"
-      version = "~> 1.10"
-    }
-  }  
 }
 
 
@@ -229,15 +223,6 @@ provider "mysql" {
   username = var.rds_user
   password = var.rds_pass
   
-}
-resource "mysql_query" "create_table" {
-  query = <<EOF
-CREATE TABLE IF NOT EXISTS users (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
-  email VARCHAR(255) NOT NULL UNIQUE
-);
-EOF
 }
 
 
