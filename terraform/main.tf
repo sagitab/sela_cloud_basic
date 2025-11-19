@@ -218,7 +218,7 @@ output "db_port" {
 }
 
 resource "null_resource" "create_table" {
-  depends_on = [aws_db_instance.flask_db]  # Wait until the DB is ready
+  depends_on = [aws_db_instance.flask_db]
 
   provisioner "local-exec" {
     command = <<EOT
@@ -233,3 +233,4 @@ resource "null_resource" "create_table" {
     EOT
   }
 }
+
