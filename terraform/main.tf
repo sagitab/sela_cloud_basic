@@ -1,6 +1,15 @@
 provider "aws" {
   region = "us-east-1"
 }
+terraform {
+  backend "s3" {
+    bucket         = "terra-backend-sagi"  # your bucket
+    key            = "FlaskApp/terraform.tfstate" # path inside bucket
+    region         = "us-east-1"
+    encrypt        = true
+  }
+}
+
 
 # -------------------
 # Networking (VPC)
