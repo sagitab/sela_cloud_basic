@@ -8,7 +8,15 @@ terraform {
     region         = "us-east-1"
     encrypt        = true
   }
+  required_providers {
+    mysql = {
+      source  = "terraform-providers/mysql"
+      version = "~> 1.10"
+    }
+  }  
 }
+
+
 variable "rds_user" {
   description = "Database username"
   type        = string
