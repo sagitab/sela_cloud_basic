@@ -53,7 +53,7 @@ jobs:
             ${{ runner.os }}-terraform-
       - name: Install MySQL client
         run: sudo apt-get update && sudo apt-get install -y mysql-client
-      - name: Deploy with Terraform 
+      - name: Deploy with Terraform
         run: |
           cd terraform
           terraform init
@@ -63,7 +63,7 @@ jobs:
           TF_VAR_rds_user: ${{ secrets.RDS_USER }}
           TF_VAR_rds_pass: ${{ secrets.RDS_PASS }}
         
-      #deploy to ecs fargate!
+      #deploy to ecs fargate!!
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
