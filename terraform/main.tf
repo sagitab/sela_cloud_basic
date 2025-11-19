@@ -218,12 +218,6 @@ output "db_endpoint" {
 output "db_port" {
   value = aws_db_instance.flask_db.port
 }
-provider "mysql" {
-  endpoint = "${aws_db_instance.mydb.address}:3306"
-  username = var.rds_user
-  password = var.rds_pass
-  
-}
 
 
 
