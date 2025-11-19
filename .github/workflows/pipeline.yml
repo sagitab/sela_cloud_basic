@@ -51,6 +51,8 @@ jobs:
           key: ${{ runner.os }}-terraform-${{ hashFiles('**/*.tf') }}
           restore-keys: |
             ${{ runner.os }}-terraform-
+      - name: Install MySQL client
+        run: sudo apt-get update && sudo apt-get install -y mysql-client
       - name: Deploy with Terraform 
         run: |
           cd terraform
