@@ -171,18 +171,6 @@ resource "aws_security_group" "rds_sg" {
 }
 
 # -------------------
-# RDS Subnet Group
-# -------------------
-resource "aws_db_subnet_group" "flask_db" {
-  name       = "flask-db-subnet-group"
-  subnet_ids = [aws_subnet.private.id, aws_subnet.public.id]  # Reference your existing subnets
-
-  tags = {
-    Name = "flask-db-subnet-group"
-  }
-}
-
-# -------------------
 # RDS Instance
 # -------------------
 resource "aws_db_instance" "flask_db" {
