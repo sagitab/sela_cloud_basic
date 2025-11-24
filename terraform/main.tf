@@ -149,15 +149,14 @@ variable "db_name" {
 # --- Security group for DB ---
 resource "aws_security_group" "rds_sg" {
   name        = "rds-sg"
-  description = "Allow access from ECS"
+  description = "Allow access to MySQL"
   vpc_id      = aws_vpc.main.id
 
-  # Allow access from ECS Fargate security group (replace with your SG)
   ingress {
-    from_port   = 3307
-    to_port     = 3307
+    from_port   = 3306
+    to_port     = 3306
     protocol    = "tcp"
-    security_groups = [aws_security_group.flask_sg.id]
+    cidr_blocks = ["0.0.0.0/0"]  # allow MySQL from anywhere for testing
   }
 
   egress {
@@ -201,7 +200,7 @@ resource "aws_db_instance" "flask_db" {
   password             = var.rds_pass
   publicly_accessible  = true
   skip_final_snapshot  = true
-  port                 = 3307
+  port                 = 3306
 
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
   db_subnet_group_name   = aws_db_subnet_group.flask_db_subnets.name
