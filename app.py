@@ -13,13 +13,14 @@ db_config = {
     "database": os.getenv("DB_NAME")      # e.g., your_database_name
 }
 
+
 def get_first_user_name():
     """Fetch the first user's name from the users table."""
     try:
         connection = mysql.connector.connect(**db_config)
         if connection.is_connected():
             cursor = connection.cursor()
-            cursor.execute("SELECT name FROM users ORDER BY id ASC LIMIT 1;")
+            cursor.execute("SELECT username FROM users WHERE id = 1;")
             result = cursor.fetchone()
             if result:
                 return result[0]  # first user's name

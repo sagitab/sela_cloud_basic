@@ -141,22 +141,21 @@ resource "aws_security_group" "flask_sg" {
   }
 }
 
-# RDS
+# Add these sections to your current file:
 
-variable "db_name" {
-  default = "flaskdb"
-}
-# --- Security group for DB ---
+# -------------------
+# RDS Security Group
+# -------------------
 resource "aws_security_group" "rds_sg" {
   name        = "rds-sg"
-  description = "Allow access to MySQL"
-  vpc_id      = aws_vpc.main.id
+  description = "Allow MySQL access"
+  vpc_id      = aws_vpc.main.id  # Reference your existing VPC
 
   ingress {
     from_port   = 3306
     to_port     = 3306
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # allow MySQL from anywhere for testing
+    cidr_blocks = ["0.0.0.0/0"]  # Or restrict to your VPC: [aws_vpc.main.cidr_block]
   }
 
   egress {
@@ -165,58 +164,67 @@ resource "aws_security_group" "rds_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-}
-resource "aws_subnet" "private_b" {
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.3.0/24"
-  availability_zone = "us-east-1b"
-  tags = { Name = "private-subnet-b" }
-}
-resource "aws_subnet" "public_b" {
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.0.4.0/24"
-  map_public_ip_on_launch = true
-  availability_zone       = "us-east-1b"
-  tags = { Name = "public-subnet-b" }
-}
-# subnet group
-resource "aws_db_subnet_group" "flask_db_subnets" {
-  name        = "flask-db-subnet-group"
-  description = "Private subnets for Flask RDS"
-  subnet_ids  = [
-    aws_subnet.public.id,
-    aws_subnet.public_b.id
-  ]
-}
-# --- RDS instance ---
-resource "aws_db_instance" "flask_db" {
-  allocated_storage    = 20
-  storage_type         = "gp2"
-  engine               = "mysql"
-  engine_version       = "8.0"
-  instance_class       = "db.t3.micro"
-  db_name              = var.db_name
-  username             = var.rds_user
-  password             = var.rds_pass
-  publicly_accessible  = true
-  skip_final_snapshot  = true
-  port                 = 3306
-
-  vpc_security_group_ids = [aws_security_group.rds_sg.id]
-  db_subnet_group_name   = aws_db_subnet_group.flask_db_subnets.name
 
   tags = {
-    Name = "FlaskApp-DB"
+    Name = "rds-sg"
   }
 }
 
-# --- Output ---
-output "db_endpoint" {
-  value = aws_db_instance.flask_db.endpoint
+# -------------------
+# RDS Subnet Group
+# -------------------
+resource "aws_db_subnet_group" "flask_db" {
+  name       = "flask-db-subnet-group"
+  subnet_ids = [aws_subnet.private.id, aws_subnet.public.id]  # Reference your existing subnets
+
+  tags = {
+    Name = "flask-db-subnet-group"
+  }
 }
 
-output "db_port" {
-  value = aws_db_instance.flask_db.port
+# -------------------
+# RDS Instance
+# -------------------
+resource "aws_db_instance" "flask_db" {
+  identifier     = "flask-app-db"
+  instance_class = "db.t3.micro"
+  allocated_storage = 20
+  storage_type   = "gp2"
+  
+  engine               = "mysql"
+  engine_version       = "8.0.43"
+  
+  # Use your existing variables
+  username = var.rds_user
+  password = var.rds_pass
+  port     = 3306
+  
+  # Network references
+  db_subnet_group_name   = aws_db_subnet_group.flask_db.name  # Reference subnet group
+  vpc_security_group_ids = [aws_security_group.rds_sg.id]     # Reference security group
+  publicly_accessible    = true
+  
+  # Basic settings
+  skip_final_snapshot     = true
+  backup_retention_period = 1
+  
+  tags = {
+    Name = "flask-app-db"
+  }
+}
+
+# -------------------
+# RDS Outputs
+# -------------------
+output "db_endpoint" {
+  description = "RDS endpoint for application connection"
+  value       = aws_db_instance.flask_db.endpoint
+}
+
+output "db_connection_string" {
+  description = "Full connection string"
+  value       = "mysql://${var.rds_user}:${var.rds_pass}@${aws_db_instance.flask_db.endpoint}"
+  sensitive   = true
 }
 
 
