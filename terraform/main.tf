@@ -212,6 +212,29 @@ resource "aws_db_instance" "flask_db" {
     Name = "flask-app-db"
   }
 }
+# Add second private subnet in different AZ
+resource "aws_subnet" "private_b" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.3.0/24"
+  availability_zone = "us-east-1b"
+  tags = { Name = "private-subnet-b" }
+}
+
+# Add second public subnet in different AZ  
+resource "aws_subnet" "public_b" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.4.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = "us-east-1b"
+  tags = { Name = "public-subnet-b" }
+}
+
+# Update subnet group with multiple AZs
+resource "aws_db_subnet_group" "flask_db" {
+  name       = "flask-db-subnet-group-new"
+  subnet_ids = [aws_subnet.private.id, aws_subnet.private_b.id]  # 2 different AZs!
+  tags = { Name = "flask-db-subnet-group-new" }
+}
 
 # -------------------
 # RDS Outputs
