@@ -67,7 +67,7 @@ jobs:
         run: |
           echo ${{ env.db_endpoint }}
                 
-      #deploy to ecs fargate!!!
+      #deploy to ecs fargate!!!!
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
