@@ -57,9 +57,8 @@ jobs:
         run: |
           cd terraform
           terraform init
-          # terraform plan
-          terraform destroy -auto-approve
-          # terraform apply -auto-approve
+          terraform plan
+          terraform apply -auto-approve
         env:
           TF_VAR_rds_user: ${{ secrets.RDS_USER }}
           TF_VAR_rds_pass: ${{ secrets.RDS_PASS }}
