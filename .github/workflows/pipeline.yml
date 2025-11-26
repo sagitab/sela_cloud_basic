@@ -60,6 +60,7 @@ jobs:
           terraform plan
           terraform destroy -auto-approve
           terraform apply -auto-approve
+          echo "db_endpoint=$(terraform output -raw db_endpoint)" >> $GITHUB_ENV
         env:
           TF_VAR_rds_user: ${{ secrets.RDS_USER }}
           TF_VAR_rds_pass: ${{ secrets.RDS_PASS }}
@@ -77,7 +78,7 @@ jobs:
               "containerOverrides": [{
                 "name": "flask-web-app",
                 "environment": [
-                  {"name": "DB_HOST", "value": "${{ steps.terraform.outputs.db_endpoint }}"},
+                  {"name": "DB_HOST", "value": "${{ env.db_endpoint }}"},
                   {"name": "DB_USER", "value": "${{ secrets.RDS_USER }}"},
                   {"name": "DB_PASSWORD", "value": "${{ secrets.RDS_PASS }}"},
                   {"name": "DB_NAME", "value": "flaskdb"}
