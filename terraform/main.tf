@@ -91,6 +91,7 @@ resource "aws_ecs_task_definition" "flask" {
       name      = "flask-web-app"
       image     = "340063596901.dkr.ecr.us-east-1.amazonaws.com/flask-web-app:latest"
       essential = true
+
       portMappings = [
         {
           containerPort = 5000
@@ -98,21 +99,19 @@ resource "aws_ecs_task_definition" "flask" {
           protocol      = "tcp"
         }
       ]
+      
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-region        = "us-east-1"
+          awslogs-group         = "/ecs/flask-app"
+          awslogs-stream-prefix = "ecs"
+        }
+      }
     }
   ])
-  # ------------------------------
-  # THIS IS THE LOG CONFIGURATION
-  # ------------------------------
-  logConfiguration = {
-    logDriver = "awslogs"
-    options = {
-      awslogs-region        = "us-east-1"
-      awslogs-group         = "/ecs/flask-app"
-      awslogs-stream-prefix = "ecs"
-    }
-  }
-
 }
+
 
 # -------------------
 # ECS Service
