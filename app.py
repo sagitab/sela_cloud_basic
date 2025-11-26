@@ -59,6 +59,7 @@ def get_first_user_name():
 
 @app.route("/")
 def home():
+    print("hii pleasse work")
     logging.info("Handling request: /")
     first_user_name = get_first_user_name()
     return render_template("index.html", user_name=first_user_name)
