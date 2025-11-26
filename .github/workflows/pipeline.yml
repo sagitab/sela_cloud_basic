@@ -58,6 +58,7 @@ jobs:
           cd terraform
           terraform init
           terraform plan
+          terraform destroy -auto-approve
           terraform apply -auto-approve
           echo "db_endpoint=$(terraform output -raw db_endpoint)" >> $GITHUB_ENV
         env:
