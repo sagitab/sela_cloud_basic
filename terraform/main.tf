@@ -230,6 +230,16 @@ resource "aws_subnet" "public_subnet2" {
     Name = "public-subnet-2"
   }
 }
+resource "aws_route_table_association" "public_subnet1" {
+  subnet_id      = aws_subnet.public_subnet1.id
+  route_table_id = aws_route_table.public.id
+}
+
+resource "aws_route_table_association" "public_subnet2" {
+  subnet_id      = aws_subnet.public_subnet2.id
+  route_table_id = aws_route_table.public.id
+}
+
 
 # Update subnet group with multiple AZs
 resource "aws_db_subnet_group" "flask_db" {
