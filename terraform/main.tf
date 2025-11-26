@@ -100,6 +100,18 @@ resource "aws_ecs_task_definition" "flask" {
       ]
     }
   ])
+  # ------------------------------
+  # THIS IS THE LOG CONFIGURATION
+  # ------------------------------
+  logConfiguration = {
+    logDriver = "awslogs"
+    options = {
+      awslogs-region        = "us-east-1"
+      awslogs-group         = "/ecs/flask-app"
+      awslogs-stream-prefix = "ecs"
+    }
+  }
+
 }
 
 # -------------------

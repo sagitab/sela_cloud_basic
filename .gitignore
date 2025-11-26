@@ -7,7 +7,7 @@ commands.txt
 .terraform/
 .terraform.lock.hcl
 crash.log
-
+.env
 # ---------------------------
 # Python / Flask
 # ---------------------------
