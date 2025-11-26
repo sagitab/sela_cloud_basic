@@ -58,6 +58,7 @@ jobs:
           cd terraform
           terraform init
           terraform plan
+          terraform destroy -auto-approve
           terraform apply -auto-approve
         env:
           TF_VAR_rds_user: ${{ secrets.RDS_USER }}
