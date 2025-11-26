@@ -216,11 +216,33 @@ resource "aws_subnet" "public_b" {
   availability_zone       = "us-east-1b"
   tags = { Name = "public-subnet-b" }
 }
+# -------------------
+# Public Subnets
+# -------------------
+resource "aws_subnet" "public_subnet1" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.10.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = "us-east-1a"
+  tags = {
+    Name = "public-subnet-1"
+  }
+}
+
+resource "aws_subnet" "public_subnet2" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.11.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = "us-east-1b"
+  tags = {
+    Name = "public-subnet-2"
+  }
+}
 
 # Update subnet group with multiple AZs
 resource "aws_db_subnet_group" "flask_db" {
   name       = "flask-db-subnet-group-new"
-  subnet_ids = [aws_subnet.public_b.id, aws_subnet.public.id]  # 2 different AZs!
+  subnet_ids = [aws_subnet.public_subnet1.id, aws_subnet.public_subnet2.id]  # 2 different AZs!
   tags = { Name = "flask-db-subnet-group-new" }
 }
 
