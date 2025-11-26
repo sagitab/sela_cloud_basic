@@ -19,7 +19,7 @@ def get_first_user_name():
         connection = mysql.connector.connect(**db_config)
         if connection.is_connected():
             cursor = connection.cursor()
-            cursor.execute("SELECT username FROM users WHERE id = 1;")
+            cursor.execute("SELECT name FROM users WHERE id = 1;")
             result = cursor.fetchone()
             if result:
                 return result[0]  # first user's name

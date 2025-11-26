@@ -84,7 +84,7 @@ jobs:
                   {"name": "DB_HOST", "value": "${{ env.db_endpoint }}"},
                   {"name": "DB_USER", "value": "${{ secrets.RDS_USER }}"},
                   {"name": "DB_PASSWORD", "value": "${{ secrets.RDS_PASS }}"},
-                  {"name": "DB_NAME", "value": "flaskdb"}
+                  {"name": "DB_NAME", "value": "flask_db"}
                 ]
               }]
             }
