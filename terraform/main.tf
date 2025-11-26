@@ -220,7 +220,7 @@ resource "aws_subnet" "public_b" {
 # Update subnet group with multiple AZs
 resource "aws_db_subnet_group" "flask_db" {
   name       = "flask-db-subnet-group-new"
-  subnet_ids = [aws_subnet.private.id, aws_subnet.private_b.id]  # 2 different AZs!
+  subnet_ids = [aws_subnet.public_b.id, aws_subnet.public.id]  # 2 different AZs!
   tags = { Name = "flask-db-subnet-group-new" }
 }
 

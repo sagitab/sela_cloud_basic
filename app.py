@@ -13,7 +13,6 @@ db_config = {
     "database": os.getenv("DB_NAME")      # e.g., your_database_name
 }
 
-
 def get_first_user_name():
     """Fetch the first user's name from the users table."""
     try:
