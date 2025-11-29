@@ -22,6 +22,60 @@ variable "rds_pass" {
   type        = string
   sensitive   = true
 }
+# -------------------
+# Security Group for EC2
+# -------------------
+resource "aws_security_group" "ec2_sg" {
+  name        = "ec2-flask-sg"
+  description = "Allow HTTP port 5000"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port   = 5000
+    to_port     = 5000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# -------------------
+# EC2 Instance (cheapest)
+# -------------------
+resource "aws_instance" "flask_ec2" {
+  ami                    = "ami-0c02fb55956c7d316" # Amazon Linux 2 (us-east-1)
+  instance_type          = "t2.micro"
+  subnet_id              = aws_subnet.public.id
+  vpc_security_group_ids = [aws_security_group.ec2_sg.id]
+  associate_public_ip_address = true
+
+  user_data = <<-EOF
+    #!/bin/bash
+    yum update -y
+    amazon-linux-extras install docker -y
+    systemctl start docker
+    systemctl enable docker
+    docker pull 340063596901.dkr.ecr.us-east-1.amazonaws.com/flask-web-app:latest
+    docker run -d -p 5000:5000 \
+      -e DB_HOST="${aws_db_instance.flask_db.endpoint}" \
+      -e DB_USER="${var.rds_user}" \
+      -e DB_PASS="${var.rds_pass}" \
+      340063596901.dkr.ecr.us-east-1.amazonaws.com/flask-web-app:latest
+  EOF
+
+  tags = { Name = "flask-ec2" }
+}
+
+# Output EC2 Public IP
+output "ec2_public_ip" {
+  value = aws_instance.flask_ec2.public_ip
+}
 
 
 # -------------------
@@ -67,91 +121,6 @@ resource "aws_route_table_association" "public" {
   subnet_id      = aws_subnet.public.id
   route_table_id = aws_route_table.public.id
 }
-
-# -------------------
-# ECS Cluster
-# -------------------
-resource "aws_ecs_cluster" "flask" {
-  name = "sagi-flask-web-app-cluster"
-}
-
-# -------------------
-# ECS Task Definition
-# -------------------
-resource "aws_ecs_task_definition" "flask" {
-  family                   = "flask-web-app-task"
-  requires_compatibilities = ["FARGATE"]
-  network_mode             = "awsvpc"
-  cpu                      = "256"
-  memory                   = "512"
-  execution_role_arn       = "arn:aws:iam::340063596901:role/ecsTaskExecutionRole"
-
-  container_definitions = jsonencode([
-    {
-      name      = "flask-web-app"
-      image     = "340063596901.dkr.ecr.us-east-1.amazonaws.com/flask-web-app:latest"
-      essential = true
-
-      portMappings = [
-        {
-          containerPort = 5000
-          hostPort      = 5000
-          protocol      = "tcp"
-        }
-      ]
-      
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          awslogs-region        = "us-east-1"
-          awslogs-group         = "/ecs/flask-app"
-          awslogs-stream-prefix = "ecs"
-        }
-      }
-    }
-  ])
-}
-
-
-# -------------------
-# ECS Service
-# -------------------
-resource "aws_ecs_service" "flask" {
-  name            = "flask-web-app-task-service"
-  cluster         = aws_ecs_cluster.flask.id
-  task_definition = aws_ecs_task_definition.flask.arn
-  desired_count   = 1
-  launch_type     = "FARGATE"
-
-  network_configuration {
-    subnets          = [aws_subnet.public.id]
-    assign_public_ip = true
-    security_groups  = [aws_security_group.flask_sg.id] # use .id, not name
-  }
-
-  deployment_minimum_healthy_percent = 100
-  deployment_maximum_percent         = 200
-}
-resource "aws_security_group" "flask_sg" {
-  name        = "flask-web-app-sg"
-  description = "Allow HTTP traffic"
-  vpc_id      = aws_vpc.main.id
-
-  ingress {
-    from_port   = 5000
-    to_port     = 5000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 # Add these sections to your current file:
 
 # -------------------
