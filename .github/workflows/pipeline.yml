@@ -67,24 +67,39 @@ jobs:
       - name: check end-point
         run: |
           echo ${{ env.db_endpoint }}
+
+      - name: Test app
+        run: |
+          EC2_IP=$(terraform output -raw ec2_public_ip)
+          echo "EC2 public IP: $EC2_IP"
+          for i in {1..20}; do
+            if curl -s http://$EC2_IP:5000 >/dev/null; then
+              echo "App is up!"
+              break
+            else
+              echo "Waiting for app..."
+              sleep 15
+            fi
+          done
+
                 
-      #deploy to ecs fargate!!!!
-      - name: Deploy to ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: flask-web-app-task-def.json
-          service: flask-web-app-task-service
-          cluster: sagi-flask-web-app-cluster
-          wait-for-service-stability: true
-          overrides: |
-            {
-              "containerOverrides": [{
-                "name": "flask-web-app",
-                "environment": [
-                  {"name": "DB_HOST", "value": "${{ env.db_endpoint }}"},
-                  {"name": "DB_USER", "value": "${{ secrets.RDS_USER }}"},
-                  {"name": "DB_PASSWORD", "value": "${{ secrets.RDS_PASS }}"},
-                  {"name": "DB_NAME", "value": "flask_db"}
-                ]
-              }]
-            }
+      # #deploy to ecs fargate!!!!
+      # - name: Deploy to ECS
+      #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      #   with:
+      #     task-definition: flask-web-app-task-def.json
+      #     service: flask-web-app-task-service
+      #     cluster: sagi-flask-web-app-cluster
+      #     wait-for-service-stability: true
+      #     overrides: |
+      #       {
+      #         "containerOverrides": [{
+      #           "name": "flask-web-app",
+      #           "environment": [
+      #             {"name": "DB_HOST", "value": "${{ env.db_endpoint }}"},
+      #             {"name": "DB_USER", "value": "${{ secrets.RDS_USER }}"},
+      #             {"name": "DB_PASSWORD", "value": "${{ secrets.RDS_PASS }}"},
+      #             {"name": "DB_NAME", "value": "flask_db"}
+      #           ]
+      #         }]
+      #       }
