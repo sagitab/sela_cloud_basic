@@ -14,7 +14,7 @@ logging.basicConfig(
 
 app = Flask(__name__)
 
-# MySQL connection config from environment variables
+# MySQL connection config from environment variables!
 db_config = {
     "host": os.getenv("DB_HOST"),
     "user": os.getenv("DB_USER"),
