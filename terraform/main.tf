@@ -132,8 +132,10 @@ resource "aws_instance" "flask_ec2" {
 
   # Pull and run container
   docker pull 340063596901.dkr.ecr.us-east-1.amazonaws.com/flask-web-app:latest
+  # setup region
+  export AWS_DEFAULT_REGION=us-east-1
 
-  # Set DB credentials (replace with your real password)
+  # Set DB credentials 
   # Export DB credentials
   RDS_USER=$(aws ssm get-parameter --name "/flask-app/db-user" --with-decryption --query "Parameter.Value" --output text)
   RDS_PASS=$(aws ssm get-parameter --name "/flask-app/db-pass" --with-decryption --query "Parameter.Value" --output text)
