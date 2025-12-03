@@ -10,7 +10,6 @@ terraform {
   }
 }
 
-
 variable "rds_user" {
   description = "Database username"
   type        = string
@@ -76,7 +75,7 @@ resource "aws_iam_policy" "ssm_read_policy" {
           "ssm:GetParameter",
           "ssm:GetParameters"
         ],
-        Resource = "arn:aws:ssm:us-east-1:parameter/flask-app/*"
+        Resource = "arn:aws:ssm:us-east-1:340063596901:parameter/flask-app/*"
       }
     ]
   })
