@@ -66,20 +66,23 @@ resource "aws_iam_role" "ec2_role" {
 }
 resource "aws_iam_role_policy" "ssm_read_policy" {
   name = "ssm-read-policy"
-  role = aws_iam_role.ec2_role.id
+  role = aws_iam_role.ec2_role.name  # use .name, not .id
 
   policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [{
-      Effect = "Allow",
-      Action = [
-        "ssm:GetParameter",
-        "ssm:GetParameters"
-      ],
-      Resource = "arn:aws:ssm:us-east-1:parameter/flask-app/*"
-    }]
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:GetParameter",
+          "ssm:GetParameters"
+        ]
+        Resource = "arn:aws:ssm:us-east-1:parameter/flask-app/*"
+      }
+    ]
   })
 }
+
 resource "aws_iam_role_policy_attachment" "ec2_instance_connect" {
   role       = aws_iam_role.ec2_role.name
   policy_arn = "arn:aws:iam::aws:policy/EC2InstanceConnect"
