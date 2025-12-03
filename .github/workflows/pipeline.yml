@@ -14,7 +14,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2. Configure AWS credentials (set these in GitHub Secrets)
+      # 2. Configure AWS credentials (set these in GitHub Secrets)!
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
