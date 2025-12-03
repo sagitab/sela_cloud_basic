@@ -109,7 +109,7 @@ resource "aws_instance" "flask_ec2" {
   docker pull 340063596901.dkr.ecr.us-east-1.amazonaws.com/flask-web-app:latest
 
   docker run -d -p 5000:5000 \
-    -e DB_HOST="${aws_db_instance.flask_db.endpoint}" \
+    -e DB_HOST="$flask-app-db.cyh22uwcyfkq.us-east-1.rds.amazonaws.com" \
     -e DB_USER="${var.rds_user}" \
     -e DB_PASS="${var.rds_pass}" \
     340063596901.dkr.ecr.us-east-1.amazonaws.com/flask-web-app:latest
