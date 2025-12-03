@@ -60,7 +60,9 @@ jobs:
           terraform plan
           #terraform destroy -auto-approve
           terraform apply -auto-approve
+          # Output vars to github env
           echo "db_endpoint=$(terraform output -raw db_endpoint)" >> $GITHUB_ENV
+          echo "ec2_public_ip=$(terraform output -raw ec2_public_ip)" >> $GITHUB_ENV
         env:
           TF_VAR_rds_user: ${{ secrets.RDS_USER }}
           TF_VAR_rds_pass: ${{ secrets.RDS_PASS }}
@@ -70,7 +72,7 @@ jobs:
 
       - name: Test app
         run: |
-          EC2_IP=$(terraform output -raw ec2_public_ip)
+          EC2_IP="${{ env.ec2_public_ip }}"
           echo "EC2 public IP: $EC2_IP"
           for i in {1..20}; do
             if curl -s http://$EC2_IP:5000 >/dev/null; then
