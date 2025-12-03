@@ -114,6 +114,9 @@ resource "aws_instance" "flask_ec2" {
   user_data = <<-EOF
   #!/bin/bash
   yum update -y
+  # Ensure SSM agent is running
+  sudo systemctl start amazon-ssm-agent
+  sudo systemctl enable amazon-ssm-agent
 
   # Install docker
   yum install -y docker
