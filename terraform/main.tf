@@ -64,6 +64,22 @@ resource "aws_iam_role" "ec2_role" {
     }]
   })
 }
+resource "aws_iam_role_policy" "ssm_read_policy" {
+  name = "ssm-read-policy"
+  role = aws_iam_role.ec2_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Action = [
+        "ssm:GetParameter",
+        "ssm:GetParameters"
+      ],
+      Resource = "arn:aws:ssm:us-east-1:parameter/flask-app/*"
+    }]
+  })
+}
 resource "aws_iam_role_policy_attachment" "ec2_instance_connect" {
   role       = aws_iam_role.ec2_role.name
   policy_arn = "arn:aws:iam::aws:policy/EC2InstanceConnect"
@@ -108,10 +124,17 @@ resource "aws_instance" "flask_ec2" {
   # Pull and run container
   docker pull 340063596901.dkr.ecr.us-east-1.amazonaws.com/flask-web-app:latest
 
+  # Set DB credentials (replace with your real password)
+  # Export DB credentials
+  RDS_USER=$(aws ssm get-parameter --name "/flask-app/db-user" --with-decryption --query "Parameter.Value" --output text)
+  RDS_PASS=$(aws ssm get-parameter --name "/flask-app/db-pass" --with-decryption --query "Parameter.Value" --output text)
+
+  # Run container
   docker run -d -p 5000:5000 \
-    -e DB_HOST="$flask-app-db.cyh22uwcyfkq.us-east-1.rds.amazonaws.com" \
-    -e DB_USER="${var.rds_user}" \
-    -e DB_PASS="${var.rds_pass}" \
+    -e DB_HOST="flask-app-db.cyh22uwcyfkq.us-east-1.rds.amazonaws.com" \
+    -e DB_USER="$RDS_USER" \
+    -e DB_PASS="$RDS_PASS" \
+    -e DB_NAME="flask_db" \
     340063596901.dkr.ecr.us-east-1.amazonaws.com/flask-web-app:latest
   EOF
 
