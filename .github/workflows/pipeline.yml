@@ -58,11 +58,11 @@ jobs:
           cd terraform
           terraform init
           terraform plan
-          #terraform destroy -auto-approve
-          terraform apply -auto-approve
+          terraform destroy -auto-approve
+          #terraform apply -auto-approve
           # Output vars to github env
-          echo "db_endpoint=$(terraform output -raw db_endpoint)" >> $GITHUB_ENV
-          echo "ec2_public_ip=$(terraform output -raw ec2_public_ip)" >> $GITHUB_ENV
+          #echo "db_endpoint=$(terraform output -raw db_endpoint)" >> $GITHUB_ENV
+          #echo "ec2_public_ip=$(terraform output -raw ec2_public_ip)" >> $GITHUB_ENV
         env:
           TF_VAR_rds_user: ${{ secrets.RDS_USER }}
           TF_VAR_rds_pass: ${{ secrets.RDS_PASS }}
