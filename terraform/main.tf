@@ -66,7 +66,7 @@ resource "aws_iam_role" "ec2_role" {
 }
 resource "aws_iam_role_policy_attachment" "ec2_instance_connect" {
   role       = aws_iam_role.ec2_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2InstanceConnect"
+  policy_arn = "arn:aws:iam::aws:policy/EC2InstanceConnect"
 }
 resource "aws_iam_role_policy_attachment" "ec2_ecr_read" {
   role       = aws_iam_role.ec2_role.name
