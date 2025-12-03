@@ -64,23 +64,27 @@ resource "aws_iam_role" "ec2_role" {
     }]
   })
 }
-resource "aws_iam_role_policy" "ssm_read_policy" {
-  name = "ssm-read-policy"
-  role = aws_iam_role.ec2_role.name  # use .name, not .id
-
+resource "aws_iam_policy" "ssm_read_policy" {
+  name        = "SSMReadFlaskApp"
+  description = "Read parameters for flask app"
   policy = jsonencode({
-    Version = "2012-10-17"
+    Version = "2012-10-17",
     Statement = [
       {
-        Effect = "Allow"
+        Effect = "Allow",
         Action = [
           "ssm:GetParameter",
           "ssm:GetParameters"
-        ]
+        ],
         Resource = "arn:aws:ssm:us-east-1:parameter/flask-app/*"
       }
     ]
   })
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_read_attach" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = aws_iam_policy.ssm_read_policy.arn
 }
 
 resource "aws_iam_role_policy_attachment" "ec2_instance_connect" {
